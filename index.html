@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Laboratorio 2: resolución del problema de tres canteras con eliminación gaussiana, Gauss-Jordan y Gauss-Seidel. Ecuaciones, procedimientos y comparación de resultados.">
+  <meta name="theme-color" content="#f5f3ec">
+  <title>Laboratorio 02 · Métodos Numéricos</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%231d302e'/%3E%3Cpath d='M22 15H15V49H22M42 15H49V49H42' fill='none' stroke='%23e8a465' stroke-width='5'/%3E%3Ccircle cx='32' cy='32' r='6' fill='%23e8a465'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="styles.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#contenido">Saltar al contenido</a>
+  <header class="header">
+    <div class="container header-inner">
+      <a class="brand" href="#inicio" aria-label="Laboratorio 2, inicio"><img class="brand-mark" src="logo.png" alt="Logotipo del laboratorio" width="190" height="190"><span>Métodos Numéricos para Ingenieros<small>Ingeniería de Sistemas y Computación · UTP <small> Aylin Montenegro - Yazir Peña </small></small></span></a>
+      <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="navigation">Menú <span aria-hidden="true">☰</span></button>
+      <nav id="navigation" class="navigation" aria-label="Navegación principal">
+        <a href="#laboratorio">El Problema</a>
+        <a href="#metodos">Métodos</a>
+        <a href="#respuestas">Respuestas</a>
+        <a class="nav-source" href="#codigo">Código Fuente</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="contenido">
+    <section id="inicio" class="hero container" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <p class="eyebrow"><span class="small-line"></span> II semestre 2026 / Laboratorio 02</p>
+        <h1 id="hero-title">Ecuaciones <em>Simultáneas.</em></h1>
+        <p class="hero-description">Tres canteras, tres materiales y un proyecto de ingeniería civil. Planteamos el sistema y lo resolvemos con Gauss, Gauss-Jordan y Gauss-Seidel.</p>
+        <div class="hero-actions"><a class="button button-dark" href="#metodos">Explorar los métodos</a><a class="text-link" href="#laboratorio">Leer el enunciado</a></div>
+        <div class="hero-meta"><span>3 × 3 <small>Ecuaciones e incógnitas</small></span><span>16 300 m³ <small>Volumen total requerido</small></span></div>
+      </div>
+      <figure class="system-figure" aria-labelledby="figure-caption">
+        <div class="figure-top"><span>UN SISTEMA. TRES CAMINOS.</span><span class="figure-index">02</span></div>
+        <div class="formula" aria-label="A por x igual a b"><span>A</span><span class="formula-x">x</span><span class="formula-equals">=</span><span>b</span></div>
+        <div class="matrix-equation quarry-matrix" aria-label="Matriz de porcentajes: filas 52, 20, 25; 30, 50, 20; 18, 30, 55. Vector independiente multiplicado por 100: 480000, 581000, 569000.">
+          <div class="matrix matrix-a" aria-hidden="true"><span>52</span><span>20</span><span>25</span><span>30</span><span>50</span><span>20</span><span>18</span><span>30</span><span>55</span></div>
+          <div class="matrix matrix-vector" aria-hidden="true"><span>x₁</span><span>x₂</span><span>x₃</span></div>
+          <span class="equals" aria-hidden="true">=</span>
+          <div class="matrix matrix-vector" aria-hidden="true"><span>480000</span><span>581000</span><span>569000</span></div>
+        </div>
+        <div class="figure-divider"></div>
+        <div class="solution-label">VOLUMEN POR CANTERA · m³</div>
+        <div class="solution-values quarry-values"><span>x₁ <b>4011.63</b></span><span>x₂ <b>7162.79</b></span><span>x₃ <b>5125.58</b></span></div>
+        <figcaption id="figure-caption">Sistema multiplicado por 100. Volúmenes redondeados a dos decimales.</figcaption>
+      </figure>
+    </section>
+
+    <section id="laboratorio" class="overview section" aria-labelledby="overview-title">
+      <div class="container overview-grid">
+        <div><p class="eyebrow">01 / ENUNCIADO Y ECUACIONES</p><h2 id="overview-title">¿Cuánto extraer<br>de cada cantera?</h2></div>
+        <div class="overview-copy"><p>Un ingeniero civil requiere <strong>4800 m³ de arena, 5810 m³ de grava fina y 5690 m³ de grava gruesa</strong> para la construcción de un proyecto. La empresa dispone de tres canteras con las siguientes composiciones.</p><p>Se busca el volumen total de mezcla que se debe tomar de cada cantera para satisfacer simultáneamente las tres necesidades.</p><div class="topic-tags"><span>Conservación de materiales</span><span>Porcentajes a decimales</span><span>Ax = b</span></div></div>
+      </div>
+      <div class="container problem-details">
+        <div class="table-scroll" tabindex="0" role="region" aria-label="Composición de las canteras"><table><caption>Composición de cada cantera y demanda del proyecto</caption><thead><tr><th scope="col">Material</th><th scope="col">Cantera 1</th><th scope="col">Cantera 2</th><th scope="col">Cantera 3</th><th scope="col">Necesidad</th></tr></thead><tbody><tr><th scope="row">Arena</th><td>52%</td><td>20%</td><td>25%</td><td>4800 m³</td></tr><tr><th scope="row">Grava fina</th><td>30%</td><td>50%</td><td>20%</td><td>5810 m³</td></tr><tr><th scope="row">Grava gruesa</th><td>18%</td><td>30%</td><td>55%</td><td>5690 m³</td></tr></tbody></table></div>
+        <div class="equation-grid"><div><h3>Definimos las incógnitas</h3><p><strong>x₁:</strong> m³ de mezcla de la cantera 1.<br><strong>x₂:</strong> m³ de mezcla de la cantera 2.<br><strong>x₃:</strong> m³ de mezcla de la cantera 3.</p><p>Cada coeficiente expresa la fracción de un material en la mezcla: 52% = 0.52. Cada columna suma 1, es decir, 100%.</p></div><div class="equation-card"><p class="process-label">UNA ECUACIÓN POR MATERIAL</p><div class="equation-list"><p><span>Arena</span>0.52x₁ + 0.20x₂ + 0.25x₃ = 4800</p><p><span>Grava fina</span>0.30x₁ + 0.50x₂ + 0.20x₃ = 5810</p><p><span>Grava gruesa</span>0.18x₁ + 0.30x₂ + 0.55x₃ = 5690</p></div><p class="equation-note">Al sumar las ecuaciones: x₁ + x₂ + x₃ = 16 300 m³. Esta igualdad verifica el total; no es una cuarta ecuación independiente.</p></div></div>
+        <details class="matrix-details"><summary>Ver la matriz aumentada inicial [A | b]</summary><pre class="math-block" aria-label="Matriz aumentada inicial">[ 0.52   0.20   0.25 | 4800 ]
+[ 0.30   0.50   0.20 | 5810 ]
+[ 0.18   0.30   0.55 | 5690 ]</pre><p>Las filas representan materiales y las columnas representan canteras.</p></details>
+      </div>
+    </section>
+
+    <section id="metodos" class="methods section container" aria-labelledby="methods-title">
+      <div class="section-heading"><div><p class="eyebrow">02 / DESARROLLO DE LOS MÉTODOS</p><h2 id="methods-title">Tres formas de llegar.</h2></div><p>Selecciona un método para ver su explicación y su aplicación al problema.</p></div>
+      <div class="method-tabs" role="tablist" aria-label="Métodos de resolución">
+        <button id="tab-gauss" class="method-tab" type="button" role="tab" aria-selected="true" aria-controls="method-panel" data-method="gauss"><span>01</span>Eliminación gaussiana<small>Método directo</small></button>
+        <button id="tab-jordan" class="method-tab" type="button" role="tab" aria-selected="false" aria-controls="method-panel" tabindex="-1" data-method="jordan"><span>02</span>Gauss-Jordan<small>Método directo</small></button>
+        <button id="tab-seidel" class="method-tab" type="button" role="tab" aria-selected="false" aria-controls="method-panel" tabindex="-1" data-method="seidel"><span>03</span>Gauss-Seidel<small>Método iterativo</small></button>
+      </div>
+      <div id="method-panel" class="method-panel" role="tabpanel" aria-labelledby="tab-gauss" tabindex="0">
+        <div class="method-summary">
+        <div class="method-detail"><span id="method-type" class="badge">MÉTODO DIRECTO</span><h3 id="method-title">Simplificar, luego sustituir.</h3><p id="method-description">La eliminación gaussiana transforma la matriz aumentada en una matriz triangular superior. Después, la sustitución regresiva permite obtener cada incógnita, desde la última hasta la primera.</p><p id="method-note" class="method-note">Ordenamos de mayor a menor según el coeficiente de x₁: 0.52, 0.30 y 0.18. El sistema ya está en ese orden. Al sustituir para hallar x₁ se necesitan tanto x₂ como x₃.</p></div>
+        <div class="method-process"><p class="process-label">EL PROCEDIMIENTO</p><ol id="method-steps"><li><span>01</span>Ordenar las ecuaciones según el coeficiente de x₁.</li><li><span>02</span>Normalizar la primera ecuación.</li><li><span>03</span>Restar a la segunda un múltiplo de la primera normalizada para eliminar x₁.</li><li><span>04</span>Restar a la tercera un múltiplo de la primera normalizada para eliminar x₁.</li><li><span>05</span>Normalizar la segunda ecuación.</li><li><span>06</span>Eliminar x₂ de la tercera con la segunda normalizada y despejar x₃.</li><li><span>07</span>Reemplazar x₃ en la segunda ecuación más reciente para encontrar x₂.</li><li><span>08</span>Reemplazar x₂ y x₃ en la primera ecuación para encontrar x₁.</li></ol><div class="method-expression" id="method-expression">[ A | b ] <span>→</span> [ U | c ] <span>→</span> x</div></div>
+        </div>
+        <article class="worked-example" id="worked-gauss" aria-labelledby="gauss-worked-title">
+          <p class="eyebrow">APLICACIÓN / ELIMINACIÓN GAUSSIANA</p><h3 id="gauss-worked-title">Ocho pasos, de la eliminación a la sustitución.</h3>
+          <p>Trabajamos con las filas F₁, F₂ y F₃ de la matriz aumentada. Cada operación se aplica a todos los coeficientes y al término independiente de la fila. Las filas que se usan en los pasos siguientes son siempre las más recientes.</p>
+          <ol class="method-guide" id="gauss-guide">
+            <li><h4>Ordenar las ecuaciones según el coeficiente de la primera incógnita.</h4><p>Tomamos los coeficientes de x₁ de mayor a menor: <strong>0.52 &gt; 0.30 &gt; 0.18</strong>. En este problema, el orden inicial ya cumple ese criterio: arena, grava fina y grava gruesa.</p><pre class="math-block">[ 0.52   0.20   0.25 | 4800 ]
+[ 0.30   0.50   0.20 | 5810 ]
+[ 0.18   0.30   0.55 | 5690 ]</pre></li>
+            <li><h4>Normalizar la primera ecuación.</h4><p>Dividimos toda F₁ entre el coeficiente de x₁, que es 0.52. El primer pivote queda igual a 1: <strong>F₁ ← F₁ / 0.52</strong>.</p><div class="substitution"><p>x₁ + (5/13)x₂ + (25/52)x₃ = 120000/13</p></div><pre class="math-block">[ 1      0.384615   0.480769 | 9230.769231 ]
+[ 0.30   0.50       0.20     | 5810        ]
+[ 0.18   0.30       0.55     | 5690        ]</pre></li>
+            <li><h4>Restar a la segunda ecuación la primera normalizada para eliminar x₁.</h4><p>Primero multiplicamos F₁ normalizada por 0.30, el coeficiente de x₁ en F₂. Después restamos: <strong>F₂ ← F₂ − 0.30F₁</strong>. Así, 0.30x₁ − 0.30x₁ = 0.</p><pre class="math-block">F₂:        [ 0.30   0.500000   0.200000 | 5810.000000 ]
+−0.30F₁:   [−0.30  −0.115385  −0.144231 |−2769.230769 ]
+Nueva F₂:  [ 0      0.384615   0.055769 | 3040.769231 ]</pre><p>En valores exactos: (5/13)x₂ + (29/520)x₃ = 39530/13.</p></li>
+            <li><h4>Restar a la tercera ecuación la primera normalizada para eliminar x₁.</h4><p>Multiplicamos la misma F₁ normalizada por 0.18 y restamos: <strong>F₃ ← F₃ − 0.18F₁</strong>. Así, 0.18x₁ − 0.18x₁ = 0.</p><pre class="math-block">F₃:        [ 0.18   0.300000   0.550000 | 5690.000000 ]
+−0.18F₁:   [−0.18  −0.069231  −0.086538 |−1661.538462 ]
+Nueva F₃:  [ 0      0.230769   0.463462 | 4028.461538 ]</pre><p>En valores exactos: (3/13)x₂ + (241/520)x₃ = 52370/13.</p></li>
+            <li><h4>Normalizar la segunda ecuación.</h4><p>El coeficiente actual de x₂ es 5/13, aproximadamente 0.384615. Dividimos la F₂ más reciente entre ese valor: <strong>F₂ ← F₂ / (5/13)</strong>.</p><div class="substitution"><p>x₂ + 0.145x₃ = 7906</p></div><pre class="math-block">[ 1   5/13   25/52  | 120000/13 ]
+[ 0     1    0.145  |      7906 ]
+[ 0   3/13   241/520 | 52370/13 ]</pre></li>
+            <li><h4>Restar a la tercera ecuación más reciente la segunda normalizada para eliminar x₂.</h4><p>El coeficiente actual de x₂ en F₃ es 3/13. Aplicamos <strong>F₃ ← F₃ − (3/13)F₂</strong>. La tercera ecuación queda con una sola incógnita: <strong>0.43x₃ = 2204</strong>.</p><pre class="math-block">F₃:          [ 0   0.230769   0.463462 | 4028.461538 ]
+−(3/13)F₂:   [ 0  −0.230769  −0.033462 |−1824.461538 ]
+Nueva F₃:    [ 0   0          0.430000 | 2204.000000 ]</pre><div class="substitution"><p>x₃ = 2204 / 0.43 = <strong>5125.581395 m³</strong></p></div><details class="matrix-details"><summary>Ver la matriz triangular final</summary><pre class="math-block">[ 1   5/13   25/52 | 120000/13 ]
+[ 0     1    0.145 |      7906 ]
+[ 0     0    0.43  |      2204 ]</pre></details></li>
+            <li><h4>Reemplazar x₃ en la segunda ecuación más reciente para encontrar x₂.</h4><p>Usamos la ecuación normalizada del paso 5: x₂ + 0.145x₃ = 7906. Sustituimos el x₃ obtenido en el paso 6.</p><div class="substitution"><p>x₂ = 7906 − 0.145 × 5125.581395</p><p>x₂ = <strong>7162.790698 m³</strong></p></div></li>
+            <li><h4>Reemplazar x₂ en la primera ecuación para encontrar x₁.</h4><p>En la primera ecuación original, 0.52x₁ + 0.20x₂ + 0.25x₃ = 4800, sustituimos x₂ y también el x₃ que ya conocemos.</p><div class="substitution"><p>x₁ = (4800 − 0.20 × 7162.790698 − 0.25 × 5125.581395) / 0.52</p><p>x₁ = <strong>4011.627907 m³</strong></p></div><p class="step-emphasis">Para hallar x₁ se necesitan los dos valores anteriores, x₂ y x₃, porque ambos aparecen en la primera ecuación.</p></li>
+          </ol><p class="worked-note">Las filas y sustituciones se muestran a seis decimales; para continuar las operaciones se conservan los valores completos o las fracciones exactas. La solución exacta es (172500/43, 308000/43, 220400/43) m³.</p>
+          <h4>Seguimiento de los resultados</h4>
+          <p>La tabla resume los 8 pasos anteriores. En los pasos 6, 7 y 8 se obtienen x₃, x₂ y x₁, respectivamente. El procedimiento termina al completar la sustitución regresiva. El símbolo — indica que esa incógnita todavía no se ha despejado.</p>
+          <div class="table-scroll" tabindex="0" role="region" aria-label="Resultados por paso de Gauss"><table><caption>Volúmenes en m³; los métodos directos no utilizan el error aproximado entre iteraciones</caption><thead><tr><th scope="col">Paso</th><th scope="col">x₁</th><th scope="col">x₂</th><th scope="col">x₃</th><th scope="col">Ea máx. (%)</th></tr></thead><tbody id="gauss-results-rows">
+              <tr><th scope="row">1</th><td>—</td><td>—</td><td>—</td><td>No aplica</td></tr>
+              <tr><th scope="row">2</th><td>—</td><td>—</td><td>—</td><td>No aplica</td></tr>
+              <tr><th scope="row">3</th><td>—</td><td>—</td><td>—</td><td>No aplica</td></tr>
+              <tr><th scope="row">4</th><td>—</td><td>—</td><td>—</td><td>No aplica</td></tr>
+              <tr><th scope="row">5</th><td>—</td><td>—</td><td>—</td><td>No aplica</td></tr>
+              <tr><th scope="row">6</th><td>—</td><td>—</td><td>5125.581395</td><td>No aplica</td></tr>
+              <tr><th scope="row">7</th><td>—</td><td>7162.790698</td><td>5125.581395</td><td>No aplica</td></tr>
+              <tr class="final-iteration"><th scope="row">8</th><td>4011.627907</td><td>7162.790698</td><td>5125.581395</td><td>No aplica</td></tr>
+            </tbody></table></div>
+          <p class="iteration-summary">Gauss completa 8 pasos: x₁ = 4011.627907 m³, x₂ = 7162.790698 m³ y x₃ = 5125.581395 m³. El error aproximado y la tolerancia del 5% no se aplican a este método directo.</p>
+        </article>
+        <article class="worked-example" id="worked-jordan" aria-labelledby="jordan-worked-title">
+          <p class="eyebrow">APLICACIÓN / GAUSS-JORDAN</p><h3 id="jordan-worked-title">Diez pasos, hasta la matriz identidad.</h3>
+          <p>Usamos F₁, F₂ y F₃ para representar las ecuaciones. Normalizar significa dividir toda una fila por su pivote. Eliminar una incógnita de una fila significa hacer cero su coeficiente mediante una operación que conserva la solución del sistema.</p>
+          <ol class="method-guide" id="jordan-guide">
+            <li><h4>Expresar los coeficientes como una matriz aumentada.</h4><p>Colocamos los coeficientes de x₁, x₂ y x₃ a la izquierda de la barra y los términos independientes a la derecha. Las filas corresponden a arena, grava fina y grava gruesa.</p><pre class="math-block">[ 0.52   0.20   0.25 | 4800 ]
+[ 0.30   0.50   0.20 | 5810 ]
+[ 0.18   0.30   0.55 | 5690 ]</pre></li>
+            <li><h4>Normalizar la primera ecuación.</h4><p>Dividimos toda F₁ entre 0.52: <strong>F₁ ← F₁ / 0.52</strong>. El coeficiente de x₁ queda igual a 1.</p><div class="substitution"><p>F₁: x₁ + (5/13)x₂ + (25/52)x₃ = 120000/13</p></div><pre class="math-block">F₁ normalizada: [ 1   0.384615   0.480769 | 9230.769231 ]</pre></li>
+            <li><h4>Usar la primera normalizada para eliminar x₁ de la segunda ecuación.</h4><p>Multiplicamos F₁ por 0.30 y restamos ese múltiplo de F₂: <strong>F₂ ← F₂ − 0.30F₁</strong>.</p><pre class="math-block">F₂:        [ 0.30   0.500000   0.200000 | 5810.000000 ]
+−0.30F₁:   [−0.30  −0.115385  −0.144231 |−2769.230769 ]
+Nueva F₂:  [ 0      0.384615   0.055769 | 3040.769231 ]</pre></li>
+            <li><h4>Usar la primera normalizada para eliminar x₁ de la tercera ecuación.</h4><p>Aplicamos <strong>F₃ ← F₃ − 0.18F₁</strong>, utilizando la misma F₁ normalizada.</p><pre class="math-block">F₃:        [ 0.18   0.300000   0.550000 | 5690.000000 ]
+−0.18F₁:   [−0.18  −0.069231  −0.086538 |−1661.538462 ]
+Nueva F₃:  [ 0      0.230769   0.463462 | 4028.461538 ]</pre><p class="process-label">MATRIZ AUMENTADA DESPUÉS DEL PASO 4</p><pre class="math-block" data-jordan-checkpoint="4">[ 1   0.384615   0.480769 | 9230.769231 ]
+[ 0   0.384615   0.055769 | 3040.769231 ]
+[ 0   0.230769   0.463462 | 4028.461538 ]</pre></li>
+            <li><h4>Normalizar la segunda ecuación más reciente.</h4><p>El nuevo pivote de F₂ es 5/13, aproximadamente 0.384615. Dividimos toda la fila entre su valor exacto: <strong>F₂ ← F₂ / (5/13)</strong>.</p><div class="substitution"><p>F₂: x₂ + 0.145x₃ = 7906</p></div><pre class="math-block">F₂ normalizada: [ 0   1   0.145 | 7906 ]</pre></li>
+            <li><h4>Eliminar x₂ de la primera ecuación con la segunda normalizada.</h4><p>El coeficiente de x₂ en F₁ es 5/13. Aplicamos <strong>F₁ ← F₁ − (5/13)F₂</strong>. Aquí eliminamos un coeficiente que está arriba del segundo pivote.</p><pre class="math-block">F₁:          [ 1   0.384615   0.480769 | 9230.769231 ]
+−(5/13)F₂:   [ 0  −0.384615  −0.055769 |−3040.769231 ]
+Nueva F₁:    [ 1   0          0.425000 | 6190.000000 ]</pre><div class="substitution"><p>F₁: x₁ + 0.425x₃ = 6190</p></div></li>
+            <li><h4>Eliminar x₂ de la tercera ecuación con la segunda normalizada.</h4><p>El coeficiente de x₂ en F₃ es 3/13. Aplicamos <strong>F₃ ← F₃ − (3/13)F₂</strong>.</p><pre class="math-block">F₃:          [ 0   0.230769   0.463462 | 4028.461538 ]
+−(3/13)F₂:   [ 0  −0.230769  −0.033462 |−1824.461538 ]
+Nueva F₃:    [ 0   0          0.430000 | 2204.000000 ]</pre><p class="process-label">MATRIZ AUMENTADA DESPUÉS DEL PASO 7</p><pre class="math-block" data-jordan-checkpoint="7">[ 1   0   0.425 | 6190 ]
+[ 0   1   0.145 | 7906 ]
+[ 0   0   0.430 | 2204 ]</pre></li>
+            <li><h4>Normalizar la tercera ecuación más reciente.</h4><p>Dividimos toda F₃ entre 0.43: <strong>F₃ ← F₃ / 0.43</strong>. La tercera fila permite leer x₃ directamente.</p><div class="substitution"><p>x₃ = 2204 / 0.43 = 220400/43 m³</p></div><pre class="math-block">F₃ normalizada: [ 0   0   1 | 5125.581395 ]</pre></li>
+            <li><h4>Eliminar x₃ de la primera ecuación con la tercera normalizada.</h4><p>El coeficiente de x₃ en F₁ es 0.425. Aplicamos <strong>F₁ ← F₁ − 0.425F₃</strong>, usando la F₃ recién normalizada.</p><pre class="math-block">F₁:        [ 1   0   0.425 | 6190.000000 ]
+−0.425F₃:  [ 0   0  −0.425 |−2178.372093 ]
+Nueva F₁:  [ 1   0   0     | 4011.627907 ]</pre></li>
+            <li><h4>Eliminar x₃ de la segunda ecuación con la tercera normalizada.</h4><p>El coeficiente de x₃ en F₂ es 0.145. Aplicamos <strong>F₂ ← F₂ − 0.145F₃</strong>.</p><pre class="math-block">F₂:        [ 0   1   0.145 | 7906.000000 ]
+−0.145F₃:  [ 0   0  −0.145 | −743.209302 ]
+Nueva F₂:  [ 0   1   0     | 7162.790698 ]</pre><p class="process-label">MATRIZ AUMENTADA DESPUÉS DEL PASO 10 · [I | x]</p><pre class="math-block" data-jordan-checkpoint="10">[ 1   0   0 | 4011.627907 ]
+[ 0   1   0 | 7162.790698 ]
+[ 0   0   1 | 5125.581395 ]</pre><p class="step-emphasis">La matriz de coeficientes es la identidad. La última columna contiene x₁, x₂ y x₃, en ese orden; la solución se lee directamente.</p></li>
+          </ol><p class="worked-note">Las filas se muestran a seis decimales; para las operaciones siguientes se conservan los valores completos o las fracciones exactas. La solución exacta es (172500/43, 308000/43, 220400/43) m³, igual que con Gauss.</p>
+          <h4>Seguimiento de los resultados</h4>
+          <p>La tabla resume los 10 pasos anteriores. En los pasos 8, 9 y 10 se leen x₃, x₁ y x₂, respectivamente. El procedimiento termina cuando la matriz de coeficientes queda como la identidad. El símbolo — indica que esa incógnita todavía no se ha despejado.</p>
+          <div class="table-scroll" tabindex="0" role="region" aria-label="Resultados por paso de Gauss-Jordan"><table><caption>Volúmenes en m³; los métodos directos no utilizan el error aproximado entre iteraciones</caption><thead><tr><th scope="col">Paso</th><th scope="col">x₁</th><th scope="col">x₂</th><th scope="col">x₃</th><th scope="col">Ea máx. (%)</th></tr></thead><tbody id="jordan-results-rows">
+              <tr><th scope="row">1</th><td>—</td><td>—</td><td>—</td><td>No aplica</td></tr>
+              <tr><th scope="row">2</th><td>—</td><td>—</td><td>—</td><td>No aplica</td></tr>
+              <tr><th scope="row">3</th><td>—</td><td>—</td><td>—</td><td>No aplica</td></tr>
+              <tr><th scope="row">4</th><td>—</td><td>—</td><td>—</td><td>No aplica</td></tr>
+              <tr><th scope="row">5</th><td>—</td><td>—</td><td>—</td><td>No aplica</td></tr>
+              <tr><th scope="row">6</th><td>—</td><td>—</td><td>—</td><td>No aplica</td></tr>
+              <tr><th scope="row">7</th><td>—</td><td>—</td><td>—</td><td>No aplica</td></tr>
+              <tr><th scope="row">8</th><td>—</td><td>—</td><td>5125.581395</td><td>No aplica</td></tr>
+              <tr><th scope="row">9</th><td>4011.627907</td><td>—</td><td>5125.581395</td><td>No aplica</td></tr>
+              <tr class="final-iteration"><th scope="row">10</th><td>4011.627907</td><td>7162.790698</td><td>5125.581395</td><td>No aplica</td></tr>
+            </tbody></table></div>
+          <p class="iteration-summary">Gauss-Jordan completa 10 pasos: x₁ = 4011.627907 m³, x₂ = 7162.790698 m³ y x₃ = 5125.581395 m³. El error aproximado y la tolerancia del 5% no se aplican a este método directo.</p>
+        </article>
+        <article class="worked-example" id="worked-seidel" aria-labelledby="seidel-worked-title">
+          <p class="eyebrow">APLICACIÓN / GAUSS-SEIDEL</p><h3 id="seidel-worked-title">Ocho pasos, aplicados a las canteras.</h3>
+          <p>Las incógnitas x₁, x₂ y x₃ representan los metros cúbicos de mezcla de cada cantera. Una iteración es una pasada completa por las tres ecuaciones, calculando primero x₁, después x₂ y finalmente x₃.</p>
+          <ol class="method-guide" id="seidel-guide">
+            <li><h4>Ordenar las ecuaciones.</h4><p>En este caso conservamos arena como primera ecuación, grava fina como segunda y grava gruesa como tercera. Los coeficientes diagonales 0.52, 0.50 y 0.55 son distintos de cero y permiten despejar las incógnitas en ese orden.</p><div class="substitution"><p>1. Arena: 0.52x₁ + 0.20x₂ + 0.25x₃ = 4800</p><p>2. Grava fina: 0.30x₁ + 0.50x₂ + 0.20x₃ = 5810</p><p>3. Grava gruesa: 0.18x₁ + 0.30x₂ + 0.55x₃ = 5690</p></div></li>
+            <li><h4>Despejar x₁ de la primera ecuación.</h4><p>Pasamos los términos de x₂ y x₃ al lado derecho y dividimos entre 0.52.</p><div class="substitution"><p>x₁ = (4800 − 0.20x₂ − 0.25x₃) / 0.52</p></div></li>
+            <li><h4>Despejar x₂ de la segunda ecuación.</h4><p>Pasamos los términos de x₁ y x₃ al lado derecho y dividimos entre 0.50.</p><div class="substitution"><p>x₂ = (5810 − 0.30x₁ − 0.20x₃) / 0.50</p></div></li>
+            <li><h4>Despejar x₃ de la tercera ecuación.</h4><p>Pasamos los términos de x₁ y x₂ al lado derecho y dividimos entre 0.55.</p><div class="substitution"><p>x₃ = (5690 − 0.18x₁ − 0.30x₂) / 0.55</p></div></li>
+            <li><h4>Asumir que x₂ y x₃ son cero en la primera ecuación.</h4><p>Iniciamos la primera iteración. Los ceros son valores iniciales, no los volúmenes definitivos de las canteras.</p><div class="substitution"><p>x₁⁽¹⁾ = (4800 − 0.20 × 0 − 0.25 × 0) / 0.52</p><p>x₁⁽¹⁾ = <strong>9230.769231 m³</strong></p></div></li>
+            <li><h4>Reemplazar x₁ en la segunda ecuación y asumir x₃ = 0.</h4><p>Usamos el x₁ que acabamos de obtener. Como todavía no hemos calculado x₃, mantenemos su valor inicial de cero.</p><div class="substitution"><p>x₂⁽¹⁾ = (5810 − 0.30 × 9230.769231 − 0.20 × 0) / 0.50</p><p>x₂⁽¹⁾ = <strong>6081.538462 m³</strong></p></div></li>
+            <li><h4>Reemplazar x₁ y x₂ en la tercera ecuación.</h4><p>Usamos los dos valores nuevos de esta misma iteración para obtener x₃. Así completamos la primera pasada.</p><div class="substitution"><p>x₃⁽¹⁾ = (5690 − 0.18 × 9230.769231 − 0.30 × 6081.538462) / 0.55</p><p>x₃⁽¹⁾ = <strong>4007.272727 m³</strong></p></div></li>
+            <li><h4>Reemplazar x₁, x₂ y x₃ y repetir el procedimiento.</h4><p>Comenzamos la segunda iteración con los valores de la primera. Actualizamos x₁ usando el x₂ y el x₃ anteriores; después calculamos x₂ con el x₁ nuevo, y x₃ con el x₁ y el x₂ nuevos.</p><div class="substitution"><p>x₁⁽²⁾ = (4800 − 0.20 × 6081.538462 − 0.25 × 4007.272727) / 0.52 = <strong>4965.142550</strong></p><p>x₂⁽²⁾ = (5810 − 0.30 × 4965.142550 − 0.20 × 4007.272727) / 0.50 = <strong>7038.005379</strong></p><p>x₃⁽²⁾ = (5690 − 0.18 × 4965.142550 − 0.30 × 7038.005379) / 0.55 = <strong>4881.586777</strong></p></div><p class="step-emphasis">A partir de esta pasada, no volvemos a asumir ceros: usamos siempre los valores más recientes disponibles.</p></li>
+          </ol>
+          <p class="worked-note">Los valores de las sustituciones se muestran a seis decimales; los cálculos internos conservan todas las cifras. El superíndice (1) indica la primera iteración y (2), la segunda.</p>
+          <details class="matrix-details"><summary>Ver la regla general de actualización</summary><p>El superíndice (k) indica la iteración actual y (k − 1), la anterior. Los valores recién calculados se utilizan inmediatamente.</p><div class="iteration-formulas"><p>x₁⁽ᵏ⁾ = (4800 − 0.20x₂⁽ᵏ⁻¹⁾ − 0.25x₃⁽ᵏ⁻¹⁾) / 0.52</p><p>x₂⁽ᵏ⁾ = (5810 − 0.30x₁⁽ᵏ⁾ − 0.20x₃⁽ᵏ⁻¹⁾) / 0.50</p><p>x₃⁽ᵏ⁾ = (5690 − 0.18x₁⁽ᵏ⁾ − 0.30x₂⁽ᵏ⁾) / 0.55</p></div></details>
+          <h4>Seguimiento y criterio de parada</h4><p>Después de cada pasada calculamos el error aproximado de cada incógnita. El programa utiliza una tolerancia del 5% para decidir cuándo dejar de repetir el paso 8.</p>
+          <div class="iteration-controls"><label for="seidel-tolerance">Tolerancia del error aproximado</label><select id="seidel-tolerance"><option value="5">5% · criterio del programa C++</option><option value="0.001">0.001% · comparación didáctica</option></select></div>
+          <div class="table-scroll" tabindex="0" role="region" aria-label="Iteraciones de Gauss-Seidel"><table><caption>Volúmenes en m³; error aproximado máximo entre las tres incógnitas</caption><thead><tr><th scope="col">Iteración</th><th scope="col">x₁</th><th scope="col">x₂</th><th scope="col">x₃</th><th scope="col">Ea máx. (%)</th></tr></thead><tbody id="seidel-rows"><tr><td>1</td><td>9230.769231</td><td>6081.538462</td><td>4007.272727</td><td>100.000000</td></tr><tr><td>2</td><td>4965.142550</td><td>7038.005379</td><td>4881.586777</td><td>85.911465</td></tr><tr><td>3</td><td>4176.927365</td><td>7161.208870</td><td>5072.346206</td><td>18.870694</td></tr><tr class="final-iteration"><td>4</td><td>4037.830143</td><td>7168.363432</td><td>5113.966445</td><td>3.444851</td></tr></tbody></table></div>
+          <p id="seidel-summary" class="iteration-summary" aria-live="polite">Con tolerancia del 5%, se detiene en la iteración 4: Ea máximo = 3.444851% y residuo relativo global = 0.203717%.</p>
+          <p class="worked-note">Eaᵢ = |(xᵢ⁽ᵏ⁾ − xᵢ⁽ᵏ⁻¹⁾) / xᵢ⁽ᵏ⁾| × 100. Se detiene cuando todos los Eaᵢ cumplen la tolerancia. Este error mide el cambio entre iteraciones, no el error verdadero. Residuo relativo global = 100 × ‖Ax − b‖∞ / ‖b‖∞. El selector cambia solo esta demostración; el C++ conserva su tolerancia del 5%.</p>
+        </article>
+      </div>
+      <p class="reference-note">Referencias de los procedimientos: <a href="https://www.cs.cornell.edu/courses/cs322/2007sp/slides/linsys1-2.pdf" target="_blank" rel="noopener noreferrer">Cornell · eliminación y Gauss-Jordan</a> y <a href="https://www.netlib.org/linalg/old_html_templates/subsection2.6.2.2.html" target="_blank" rel="noopener noreferrer">Netlib · Gauss-Seidel</a>. El desarrollo numérico corresponde al sistema de este laboratorio.</p>
+      <noscript><p class="no-script">Los desarrollos de los tres métodos se muestran completos. Activa JavaScript para usar las pestañas y cambiar la tolerancia de la demostración de Gauss-Seidel.</p></noscript>
+    </section>
+
+    <section id="respuestas" class="journey section" aria-labelledby="answers-title">
+      <div class="container"><div class="section-heading"><div><p class="eyebrow">03 / RESPUESTAS DEL LABORATORIO</p><h2 id="answers-title">Comparar con criterio.</h2></div><p>Resultados para este sistema, con x⁽⁰⁾ = 0 y tolerancia del 5% en Gauss-Seidel.</p></div>
+        <p class="comparison-definitions"><strong>Precisión numérica:</strong> cifras disponibles y control del redondeo. <strong>Exactitud:</strong> cercanía a la solución matemática de referencia. Se evalúan con criterios distintos.</p>
+        <div class="answers-grid"><article><span class="step-number">a / RAPIDEZ</span><h3>Gauss es la opción directa más eficiente.</h3><p>Para resolver este sistema pequeño, la eliminación gaussiana requiere menos trabajo aritmético que llevar toda la matriz a la identidad con Gauss-Jordan. Por eso se recomienda Gauss por su eficiencia.</p><p>En sentido estricto, solo Gauss-Seidel <strong>converge por iteraciones</strong>: aquí cumple el criterio del 5% en 4 iteraciones. Gauss y Gauss-Jordan terminan tras un procedimiento finito. El tiempo de ejecución depende de la implementación; no se comparan iteraciones con operaciones elementales como si fueran equivalentes.</p></article><article><span class="step-number">b / PRECISIÓN</span><h3>Gauss y Gauss-Jordan son comparables.</h3><p>Con la misma aritmética y conservando las cifras internas, ambos métodos directos permiten obtener este resultado con muchos más dígitos correctos que Gauss-Seidel detenido al 5%.</p><p>No existe un ganador universal entre los dos métodos directos: influyen el redondeo, el pivoteo y el condicionamiento. En Gauss-Seidel, una tolerancia más exigente mejora la aproximación; mostrar más decimales por sí solo no mejora la precisión.</p></article><article><span class="step-number">c / EXACTITUD</span><h3>Los dos métodos directos empatan.</h3><p>En aritmética exacta, Gauss y Gauss-Jordan entregan la misma solución racional. Con el criterio del 5%, Gauss-Seidel queda más alejado de esa referencia: sus diferencias absolutas son aproximadamente <strong>26.202236, 5.572734 y 11.614950 m³</strong> para las canteras 1, 2 y 3.</p><p>El residuo relativo global de esa aproximación es <strong>0.203717%</strong>. Un cálculo decimal siempre puede tener redondeo; la solución matemática exacta se expresa mediante fracciones.</p></article><article class="volume-answer"><span class="step-number">d / VOLÚMENES</span><h3>Mezcla a extraer de cada cantera.</h3><dl><div><dt>Cantera 1</dt><dd>4011.63 <small>m³</small></dd></div><div><dt>Cantera 2</dt><dd>7162.79 <small>m³</small></dd></div><div><dt>Cantera 3</dt><dd>5125.58 <small>m³</small></dd></div></dl><p>Valores exactos: x₁ = 172500/43, x₂ = 308000/43 y x₃ = 220400/43 m³. <strong>Total: 16 300 m³.</strong> Los valores a dos decimales satisfacen las demandas aproximadamente; las fracciones lo hacen exactamente.</p></article></div>
+        <p class="reference-note">La comparación de trabajo aritmético entre Gauss y Gauss-Jordan se apoya en <a href="https://www.cs.cornell.edu/courses/cs322/2007sp/slides/linsys1-2.pdf" target="_blank" rel="noopener noreferrer">Cornell · Linear Systems I, sección Gaussian elimination</a>.</p>
+      </div>
+    </section>
+
+    <section id="verificacion" class="section container" aria-labelledby="verification-title"><div class="section-heading"><div><p class="eyebrow">04 / VERIFICACIÓN</p><h2 id="verification-title">Los materiales sí cuadran.</h2></div><p>Se sustituyen los volúmenes exactos en las ecuaciones originales.</p></div><div class="table-scroll" tabindex="0" role="region" aria-label="Verificación de los materiales"><table><caption>Aportes de cada cantera en m³, mostrados a seis decimales</caption><thead><tr><th scope="col">Material</th><th scope="col">Cantera 1</th><th scope="col">Cantera 2</th><th scope="col">Cantera 3</th><th scope="col">Total exacto</th><th scope="col">Requerido</th></tr></thead><tbody><tr><th scope="row">Arena</th><td>2086.046512</td><td>1432.558140</td><td>1281.395349</td><td>4800</td><td>4800</td></tr><tr><th scope="row">Grava fina</th><td>1203.488372</td><td>3581.395349</td><td>1025.116279</td><td>5810</td><td>5810</td></tr><tr><th scope="row">Grava gruesa</th><td>722.093023</td><td>2148.837209</td><td>2819.069767</td><td>5690</td><td>5690</td></tr></tbody></table></div><p class="worked-note">Los totales se calculan con las fracciones exactas, antes de redondear los aportes de la tabla. El residuo exacto Ax − b es (0, 0, 0).</p></section>
+
+    <section id="codigo" class="source section container" aria-labelledby="source-title">
+      <div class="source-card"><div><p class="eyebrow">05 / LA IMPLEMENTACIÓN</p><h2 id="source-title">La teoría, en código.</h2><p>En el programa, introduce 3 ecuaciones y 3 incógnitas. Escribe los coeficientes y el término independiente de cada fila con punto decimal. Para Gauss-Seidel, permite al menos 4 iteraciones para alcanzar el criterio del 5% en este caso.</p><a class="button button-light" href="sistemas_lineales.cpp" download>Descargar código C++</a></div><div class="code-preview" aria-label="Datos que debes introducir en el programa"><div class="code-header"><span class="code-dot" aria-hidden="true"></span>Datos del problema · Ax = b</div><pre><code><span class="code-comment">// a[i][1], a[i][2], a[i][3], b[i]</span>
+0.52   0.20   0.25   4800
+0.30   0.50   0.20   5810
+0.18   0.30   0.55   5690
+
+<span class="code-comment">// Menú: 1 = Gauss</span>
+<span class="code-comment">//       2 = Gauss-Jordan</span>
+<span class="code-comment">//       3 = Gauss-Seidel</span></code></pre><span class="code-caption">Porcentajes convertidos a fracciones decimales.</span></div></div>
+      <div class="live-terminal" aria-labelledby="terminal-title">
+        <div class="terminal-heading"><div><p class="eyebrow">PRUEBA EN VIVO</p><h3 id="terminal-title">Una consola para experimentar.</h3><p>Introduce tus datos y sigue las operaciones en pantalla. Los métodos del programa C++ están adaptados a JavaScript para funcionar directamente en tu navegador.</p></div><span class="terminal-language">Consola interactiva</span></div>
+        <div class="terminal-actions"><button id="terminal-start" class="button button-dark" type="button">Iniciar consola</button><button id="terminal-example" class="terminal-secondary" type="button">Cargar ejemplo de canteras</button><button id="terminal-stop" class="terminal-secondary" type="button" disabled>Detener</button><button id="terminal-clear" class="terminal-secondary" type="button">Limpiar pantalla</button></div>
+        <div class="terminal-window"><div class="terminal-bar"><span>Sistemas lineales · Ax = b</span><span id="terminal-state" role="status" aria-live="polite">Sin iniciar</span></div><pre id="terminal-output" tabindex="0" aria-label="Salida de la consola">Pulsa «Iniciar consola» para ingresar un sistema o «Cargar ejemplo de canteras» para comenzar con los datos del laboratorio.
+</pre><form id="terminal-form" class="terminal-input-row"><label for="terminal-input" class="terminal-prompt">&gt;</label><input id="terminal-input" type="text" autocomplete="off" spellcheck="false" aria-label="Respuesta para la consola" placeholder="Escribe la respuesta y presiona Enter" disabled><button id="terminal-send" type="submit" disabled>Enviar</button></form></div>
+        <p class="terminal-hint">Introduce números con punto decimal. En el menú: 1 = Gauss, 2 = Gauss-Jordan, 3 = Gauss-Seidel y 0 = salir. «Cargar ejemplo» inicia una nueva sesión con las canteras; después elige el método.</p>
+        <noscript><p class="no-script">Activa JavaScript para usar la terminal interactiva.</p></noscript>
+      </div>
+    </section>
+  </main>
+  <footer class="footer container"><span>Métodos Numéricos para Ingeniería</span><span>Laboratorio 02 · II semestre 2026</span><a href="#inicio">Volver al inicio</a></footer>
+</body>
+</html>
